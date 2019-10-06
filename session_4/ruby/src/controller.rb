@@ -28,6 +28,10 @@ class Controller < Sinatra::Base
     reply(tip_descriptor)
   end
 
+  delete '/tips/:id' do
+    Repository.flush
+  end
+
   private
 
   def reply(message)

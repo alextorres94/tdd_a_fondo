@@ -3,6 +3,10 @@ require_relative 'helpers'
 describe 'API' do
   include Helpers
 
+  before do
+    Repository.flush
+  end
+
   it 'lists all stored tips' do
     a_tip = TipBuilder.a_tip.with.build
     TestRepository.store(a_tip)
@@ -31,6 +35,23 @@ describe 'API' do
     expect(last_parsed_response['address']).to eq(tip['address'])
     expect(last_parsed_response['message']).to eq(tip['message'])
     expect(last_parsed_response['advisor']).to eq(tip['advisor'])
+  end
+
+  it 'deletes a tip' do
+    a_tip = TipBuilder.a_tip.with.build
+    post '/tips', JSON.dump(a_tip)
+    a_id = last_parsed_response['id']
+
+    another_tip = TipBuilder.a_tip.with.build
+    post '/tips', JSON.dump(another_tip)
+    another_id = last_parsed_response['id']
+
+    delete "/tips/#{another_id}"
+    expect(last_response.status).to eq(200)
+
+    get '/tips'
+    expect(last_parsed_response).to include(:id => a_id)
+    expect(last_parsed_response).not_to include(:id => another_id)
   end
 end
 

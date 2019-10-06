@@ -8,4 +8,8 @@ class Repository
   def self.store(something)
     @@data << something
   end
+
+  def self.flush
+    @@data = []
+  end
 end
